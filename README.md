@@ -210,3 +210,5 @@ Command to execute: cat /root/root.txt
 ```
 
 ## Finished, thanks for reading!
+I've prepared writeups for many machines, feel free to check back or ask for help!
+
